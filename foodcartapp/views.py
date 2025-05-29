@@ -1,5 +1,7 @@
 import json
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from django.http import JsonResponse
 from django.templatetags.static import static
 
@@ -62,6 +64,30 @@ def product_list_api(request):
 @api_view(['POST'])
 def register_order(request):
     order = request.data
+    if 'products' not in order:
+        return (
+            Response({'error': 'products: Обязательное поле.'},
+            status=status.HTTP_400_BAD_REQUEST)
+        )
+
+    elif order['products'] is None:
+        return (
+            Response({'error': 'products: Это поле не может быть пустым.'},
+            status=status.HTTP_400_BAD_REQUEST)
+        )
+
+    elif not isinstance(order['products'], list):
+        return (
+            Response({'error': 'products: Ожидался list со значениями, но был получен "str".'},
+            status=status.HTTP_400_BAD_REQUEST)
+        )
+
+    elif not order['products']:
+        return (
+            Response({'error': 'products: Этот список не может быть пустым.'},
+            status=status.HTTP_400_BAD_REQUEST)
+            )
+
     create_order = Order.objects.create(
         first_name=order['firstname'],
         last_name=order.get('lastname', ''),
