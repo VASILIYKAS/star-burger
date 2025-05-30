@@ -117,9 +117,9 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'phone_number', 'address']
+    list_display = ['firstname', 'lastname', 'phonenumber', 'address']
     list_filter = ['id']
-    search_fields = ['first_name', 'last_name', 'phone_number', 'address']
+    search_fields = ['firstname', 'lastname', 'phonenumber', 'address']
     inlines = [OrderItemInline]
 
 
@@ -127,4 +127,4 @@ class OrderAdmin(admin.ModelAdmin):
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'quantity']
     list_filter = ['order']
-    search_fields = ['product__name', 'order__first_name', 'order__last_name']
+    search_fields = ['product__name', 'order__firstname', 'order__lastname']
