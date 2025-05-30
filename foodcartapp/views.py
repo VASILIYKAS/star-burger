@@ -67,9 +67,32 @@ def product_list_api(request):
     })
 
 
+class PhoneNumberField(serializers.CharField):
+    def to_internal_value(self, data):
+        if data == "":
+            raise ValidationError("phonenumber: Это поле не может быть пустым.")
+
+        try:
+            parsed = phonenumbers.parse(data, "RU")
+            if not phonenumbers.is_valid_number(parsed):
+                raise ValidationError("phonenumber: Введен некорректный номер телефона.")
+        except phonenumbers.NumberParseException:
+            raise ValidationError("phonenumber: Неверный формат номера телефона.")
+
+
+class ProductItemSerializer(serializers.Serializer):
+    product = serializers.IntegerField(min_value=1)
+    quantity = serializers.IntegerField(min_value=1)
+
+    def validate_product(self, value):
+        if not Product.objects.filter(id=value).exists():
+            raise ValidationError(f'Недопустимый первичный ключ продукта "{value}"')
+
+
 class ApplicationSerializer(Serializer):
     firstname = CharField()
     lastname = CharField()
+    phonenumber = PhoneNumberField()
     address = CharField()
     products = serializers.ListField(
         child=serializers.DictField(
@@ -78,33 +101,15 @@ class ApplicationSerializer(Serializer):
         allow_empty=False
     )
 
+    def validate_products(self, order):
+        for item in order:
+            serializer = ProductItemSerializer(data=item)
+            serializer.is_valid(raise_exception=True)
+
 
 def validate(order):
     serializer = ApplicationSerializer(data=order)
     serializer.is_valid(raise_exception=True)
-
-    id_products = [item['product'] for item in order['products']]
-    products = Product.objects.all()
-
-    if order.get("phonenumber") == "":
-        raise ValidationError(
-            {'error': 'phonenumber: Это поле не может быть пустым.'}
-        )
-
-    try:
-        parsed_number = phonenumbers.parse(order['phonenumber'], "RU")
-        if not phonenumbers.is_valid_number(parsed_number):
-            raise ValueError
-    except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
-        raise ValidationError(
-            {'error': 'phonenumber: Введен некорректный номер телефона.'}
-        )
-
-    for id_product in id_products:
-        if id_product > len(products):
-            raise ValidationError(
-                {'error': f'products: Недопустимый первичный ключ "{id_product}"'}
-            )
 
 
 @api_view(['POST'])
