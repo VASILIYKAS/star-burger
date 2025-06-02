@@ -3,6 +3,7 @@ import phonenumbers
 from rest_framework.decorators import api_view
 from rest_framework.serializers import ValidationError
 from rest_framework import serializers
+from rest_framework.response import Response
 
 from django.http import JsonResponse
 from django.templatetags.static import static
@@ -91,7 +92,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['firstname', 'lastname', 'phonenumber', 'address', 'products']
+        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
 
     def validate(self, data):
         if not data.get('items'):
@@ -118,4 +119,5 @@ def register_order(request):
             quantity=item['quantity']
         )
 
-    return JsonResponse({})
+    output_serializer = OrderSerializer(order)
+    return Response(output_serializer.data, status=201)
