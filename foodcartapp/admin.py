@@ -111,7 +111,7 @@ class ProductAdmin(admin.ModelAdmin):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
-    fields = ['product', 'quantity']
+    fields = ['product', 'quantity', 'price']
     autocomplete_fields = ['product']
 
 
@@ -125,6 +125,6 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['order', 'product', 'quantity']
+    list_display = ['order', 'product', 'quantity', 'price']
     list_filter = ['order']
     search_fields = ['product__name', 'order__firstname', 'order__lastname']
