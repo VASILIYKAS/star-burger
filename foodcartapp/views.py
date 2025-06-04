@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.db import transaction
 
 from .models import Product
 from .models import Order, OrderItem, Product
@@ -101,23 +102,28 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 @api_view(['POST'])
+@transaction.atomic
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    order = Order.objects.create(
-        firstname=serializer.validated_data['firstname'],
-        lastname=serializer.validated_data['lastname'],
-        phonenumber=serializer.validated_data['phonenumber'],
-        address=serializer.validated_data['address'],
-    )
-
-    for item in serializer.validated_data['items']:
-        OrderItem.objects.create(
-            order=order,
-            product=item['product'],
-            quantity=item['quantity']
+    try:
+        order = Order.objects.create(
+            firstname=serializer.validated_data['firstname'],
+            lastname=serializer.validated_data['lastname'],
+            phonenumber=serializer.validated_data['phonenumber'],
+            address=serializer.validated_data['address'],
         )
+
+        for item in serializer.validated_data['items']:
+            OrderItem.objects.create(
+                order=order,
+                product=item['product'],
+                quantity=item['quantity'],
+                price=item['product'].price
+            )
+    except Exception as error:
+        return Response({'error': str(error)}, status=400)
 
     output_serializer = OrderSerializer(order)
     return Response(output_serializer.data, status=201)
