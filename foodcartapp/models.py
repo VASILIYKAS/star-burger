@@ -180,6 +180,20 @@ class Order(models.Model):
         db_index=True,
     )
 
+    PAYMENT_METHODS = [
+        ('cash', 'Наличными'),
+        ('card', 'Картой онлайн'),
+        ('card_courier', 'Картой курьеру'),
+    ]
+
+    payment_method = models.CharField(
+        'Способ оплаты',
+        max_length=20,
+        choices=PAYMENT_METHODS,
+        default='card',
+        db_index=True
+    )
+
     comment = models.TextField('Комантарий', blank=True, null=True)
 
     objects = OrderQuerySet.as_manager()
