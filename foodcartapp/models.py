@@ -7,12 +7,14 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Restaurant(models.Model):
     name = models.CharField(
         'название',
-        max_length=50
+        max_length=50,
+        db_index=True,
     )
     address = models.CharField(
         'адрес',
         max_length=100,
         blank=True,
+        db_index=True,
     )
     contact_phone = models.CharField(
         'контактный телефон',
@@ -55,7 +57,8 @@ class ProductCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(
         'название',
-        max_length=50
+        max_length=50,
+        db_index=True,
     )
     category = models.ForeignKey(
         ProductCategory,
@@ -133,10 +136,25 @@ class OrderQuerySet(models.QuerySet):
 
 
 class Order(models.Model):
-    firstname = models.CharField('Имя', max_length=255)
+    firstname = models.CharField('Имя', max_length=255, db_index=True,)
     lastname = models.CharField('Фамилия', max_length=255)
-    phonenumber = PhoneNumberField('Телефон', region='RU')
-    address = models.CharField('адрес', max_length=255)
+    phonenumber = PhoneNumberField('Телефон', region='RU', db_index=True,)
+    address = models.CharField('адрес', max_length=255, db_index=True,)
+
+    STATUS_CHOICES = [
+        ('accepted', 'Принят'),
+        ('assembly', 'Сборка'),
+        ('delivery', 'Доставка'),
+        ('completed', 'Выполнен'),
+    ]
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='accepted',
+        verbose_name='Статус заказа',
+        db_index=True,
+    )
 
     objects = OrderQuerySet.as_manager()
 
@@ -153,13 +171,13 @@ class OrderItem(models.Model):
         Order,
         related_name='items',
         verbose_name='Заказ',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     product = models.ForeignKey(
         Product,
         related_name='order_items',
         verbose_name='Товар',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     quantity = models.IntegerField('Количество', validators=[MinValueValidator(1)])
 
