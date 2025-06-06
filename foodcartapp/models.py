@@ -196,6 +196,15 @@ class Order(models.Model):
 
     comment = models.TextField('Комантарий', blank=True, null=True)
 
+    restaurant = models.ForeignKey(
+        Restaurant,
+        verbose_name='Ресторан',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='orders'
+    )
+
     objects = OrderQuerySet.as_manager()
 
     class Meta:

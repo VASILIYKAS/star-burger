@@ -21,6 +21,7 @@
       <th>Телефон</th>
       <th>Адрес доставки</th>
       <th>Комментарий</th>
+      <th>Рестораны</th>
       <th>Сылка на админку</th>
     </tr>
 
@@ -30,10 +31,27 @@
         <td>{{ item.get_status_display }}</td>
         <td>{{ item.get_payment_method_display }}</td>
         <td>{{ item.total_cost }}</td>
-        <td>{{ item.firstname }} {{ order.lastname }}</td>
+        <td>{{ item.firstname }} {{ item.lastname }}</td>
         <td>{{ item.phonenumber }}</td>
         <td>{{ item.address }}</td>
         <td>{{ item.comment }}</td>
+        <td> 
+          {% if item.restaurant %}
+            <p>Готовит: </p>
+            <p>{{ item.restaurant.name }}</p>
+          {% else %}
+            <details>
+              <p><summary>Выберите ресторан</summary></p>
+              <div>
+                {% for restaurant in item.available_restaurants %}
+                  <p>• {{ restaurant.name }}</p>
+                {% empty %}
+                  <p>Нет доступных ресторанов</p>
+                {% endfor %}
+              </div>
+            </details>
+          {% endif %}
+        </td>
         <td><a href="{% url 'admin:foodcartapp_order_change' item.id %}?next={{ request.get_full_path|urlencode }}">Редактировать</a></td>
       </tr>
     {% endfor %}
