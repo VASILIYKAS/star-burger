@@ -11,6 +11,7 @@ from .models import Restaurant
 from .models import RestaurantMenuItem
 from .models import Order
 from .models import OrderItem
+from geodata.utils import get_or_create_location
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -123,6 +124,10 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ['id', 'status']
     search_fields = ['firstname', 'lastname', 'phonenumber', 'address']
     inlines = [OrderItemInline]
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        get_or_create_location(obj.address)
 
     def response_post_save_change(self, request, obj):
         response = super().response_post_save_change(request, obj)

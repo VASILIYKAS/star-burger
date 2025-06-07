@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.templatetags.static import static
 from django.db import transaction
 
+from geodata.utils import get_or_create_location
 from .models import Product
 from .models import Order, OrderItem, Product
 
@@ -106,6 +107,7 @@ class OrderSerializer(serializers.ModelSerializer):
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+    address = serializer.validated_data['address']
 
     try:
         order = Order.objects.create(
@@ -122,6 +124,8 @@ def register_order(request):
                 quantity=item['quantity'],
                 price=item['product'].price
             )
+
+        get_or_create_location(address)
     except Exception as error:
         return Response({'error': str(error)}, status=400)
 
