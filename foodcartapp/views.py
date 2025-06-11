@@ -1,17 +1,12 @@
-import phonenumbers
-
-from rest_framework.decorators import api_view
-from rest_framework.serializers import ValidationError
-from rest_framework import serializers
-from rest_framework.response import Response
-
+from django.db import transaction
 from django.http import JsonResponse
 from django.templatetags.static import static
-from django.db import transaction
 
-from geodata.utils import get_or_create_location
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from .models import Product
-from .models import Order, OrderItem, Product
+from .serializers import OrderSerializer
 
 
 def banners_list_api(request):
@@ -66,66 +61,14 @@ def product_list_api(request):
     })
 
 
-class PhoneNumberField(serializers.CharField):
-    def to_internal_value(self, phonenumber):
-        if phonenumber == '':
-            raise ValidationError('phonenumber: Это поле не может быть пустым.')
-
-        try:
-            parsed = phonenumbers.parse(phonenumber, 'RU')
-            if not phonenumbers.is_valid_number(parsed):
-                raise ValidationError('phonenumber: Введен некорректный номер телефона.')
-        except phonenumbers.NumberParseException:
-            raise ValidationError('phonenumber: Неверный формат номера телефона.')
-        return phonenumber
-
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-
-    class Meta:
-        model = OrderItem
-        fields = ['product', 'quantity']
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    phonenumber = PhoneNumberField()
-    products = OrderItemSerializer(many=True, source='items')
-
-    class Meta:
-        model = Order
-        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
-
-    def validate(self, data):
-        if not data.get('items'):
-            raise serializers.ValidationError({'products': 'Этот список не может быть пустым.'})
-        return data
-
-
 @api_view(['POST'])
 @transaction.atomic
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    address = serializer.validated_data['address']
 
     try:
-        order = Order.objects.create(
-            firstname=serializer.validated_data['firstname'],
-            lastname=serializer.validated_data['lastname'],
-            phonenumber=serializer.validated_data['phonenumber'],
-            address=serializer.validated_data['address'],
-        )
-
-        for item in serializer.validated_data['items']:
-            OrderItem.objects.create(
-                order=order,
-                product=item['product'],
-                quantity=item['quantity'],
-                price=item['product'].price
-            )
-
-        get_or_create_location(address)
+        order = serializer.save()
     except Exception as error:
         return Response({'error': str(error)}, status=400)
 
