@@ -31,16 +31,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     phonenumber = PhoneNumberField()
-    products = OrderItemSerializer(many=True, source='items')
+    products = OrderItemSerializer(many=True, source='items', allow_empty=False)
 
     class Meta:
         model = Order
         fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
-
-    def validate(self, data):
-        if not data.get('items'):
-            raise serializers.ValidationError({'products': 'Этот список не может быть пустым.'})
-        return data
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
