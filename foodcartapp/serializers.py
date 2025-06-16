@@ -1,24 +1,8 @@
-import phonenumbers
-
-from django.core.exceptions import ValidationError
 from geodata.utils import get_or_create_location
 from rest_framework import serializers
+from phonenumber_field.serializerfields import PhoneNumberField
 
 from .models import Order, OrderItem, Product
-
-
-class PhoneNumberField(serializers.CharField):
-    def to_internal_value(self, phonenumber):
-        if phonenumber == '':
-            raise ValidationError('phonenumber: Это поле не может быть пустым.')
-
-        try:
-            parsed = phonenumbers.parse(phonenumber, 'RU')
-            if not phonenumbers.is_valid_number(parsed):
-                raise ValidationError('phonenumber: Введен некорректный номер телефона.')
-        except phonenumbers.NumberParseException:
-            raise ValidationError('phonenumber: Неверный формат номера телефона.')
-        return phonenumber
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -30,7 +14,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    phonenumber = PhoneNumberField()
+    phonenumber = PhoneNumberField(region='RU')
     products = OrderItemSerializer(many=True, source='items', allow_empty=False)
 
     class Meta:
