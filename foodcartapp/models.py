@@ -194,7 +194,7 @@ class Order(models.Model):
         db_index=True
     )
 
-    comment = models.TextField('Комантарий', blank=True, null=True)
+    comment = models.TextField('Комантарий', blank=True)
 
     restaurant = models.ForeignKey(
         Restaurant,
