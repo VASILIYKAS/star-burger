@@ -67,10 +67,7 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    try:
-        order = serializer.save()
-    except Exception as error:
-        return Response({'error': str(error)}, status=400)
+    order = serializer.save()
 
     output_serializer = OrderSerializer(order)
     return Response(output_serializer.data, status=201)
