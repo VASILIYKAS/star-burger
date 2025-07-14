@@ -58,9 +58,17 @@ pip install -r requirements.txt
 ```sh
 SECRET_KEY=django-insecure-0if40nf4nf93n4
 ```
-Так же необходимо добавить переменную окружения с API-ключом от Яндекса Геокодер, получить можно [здесь](https://developer.tech.yandex.ru/services).
+Добавьте переменную окружения с API-ключом от Яндекса Геокодер, получить можно [здесь](https://developer.tech.yandex.ru/services).
 ```sh
 YANDEX_APIKEY=ваш_ключ
+```
+Добавьте переменную окружения с ключом [Rollbar](rollbar.com), ключ можно создать в настройках вашего проекта в разделе "Project Access Tokens"
+```sh
+ROLLBAR_ACCESS_TOKEN=ваш_ключ
+```
+Так же при необходимости добавьте переменную окружения с значением "production" для продакшн версии или "local" для dev-версии сайта по умолчанию задана "local" версия. Это значение будет отображаться на сайте rollbar 
+```sh
+ENVIRONMENT=значение
 ```
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
 
@@ -150,6 +158,10 @@ Parcel будет следить за файлами в каталоге `bundle
 - `DEBUG` — дебаг-режим. Поставьте `False`.
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+- `ROLLBAR_ACCESS_TOKEN` — переменная окружения с ключом [Rollbar](rollbar.com), ключ можно создать в настройках вашего проекта в разделе "Project Access Tokens"
+- `YANDEX_APIKEY` — переменная окружения с API-ключом от Яндекса Геокодер, получить можно [здесь](https://developer.tech.yandex.ru/services)
+- `ENVIRONMENT` — "production" для продакшн версии или "local" для dev-версии сайта по умолчанию "local"
+
 
 ## Цели проекта
 
