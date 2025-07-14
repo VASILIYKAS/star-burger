@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 from collections import defaultdict
-
+from django.http import HttpResponse
 
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 from geodata.models import Location
