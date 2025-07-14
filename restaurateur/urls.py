@@ -6,7 +6,7 @@ from . import views
 app_name = "restaurateur"
 
 urlpatterns = [
-    path('', lambda request: redirect('restaurateur:ProductsView')),
+    path('manager/', lambda request: redirect('restaurateur:ProductsView')),
 
     path('products/', views.view_products, name="ProductsView"),
 
