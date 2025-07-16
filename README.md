@@ -163,6 +163,77 @@ Parcel будет следить за файлами в каталоге `bundle
 - `ENVIRONMENT` — "production" для продакшн версии или "local" для dev-версии сайта по умолчанию "local"
 
 
+## Переход с SQLite на PostgreSQL в Django
+
+### Необходимые шаги:
+
+1. Установка PostgreSQL.\
+Убедитесь, что у вас установлен PostgreSQL. Скачать и установить его можно с официального сайта: [www.postgresql.org](https://www.postgresql.org/download/)
+
+2. Создайте новую базу данных PostgreSQL. Команда:
+```sh
+CREATE DATABASE myproject;
+```
+3. Создайте пользователя с соответствующими правами. Команда:
+```sh
+CREATE USER myprojectuser WITH PASSWORD 'password';
+
+ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
+ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
+ALTER ROLE myprojectuser SET timezone TO 'UTC';
+
+GRANT ALL PRIVILEGES ON DATABASE myproject TO myprojectuser;
+```
+
+4. Сделайте дамп вашей старой БД. Команда:
+```sh
+python manage.py dumpdata --indent 2 --output data.json
+```
+Подробнее [здесь](https://docs.djangoproject.com/en/5.2/ref/django-admin/#dumpdata).
+
+5. Редактирование файла настроек settings.py.\
+Откройте файл settings.py вашего Django-проекта и измените раздел DATABASES следующим образом:
+```python
+import dj_database_url
+
+
+DATABASE_URL = os.getenv('DB_URL')
+
+DATABASES = {
+    'default': dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
+```
+Подробнее [здесь](https://github.com/jazzband/dj-database-url#url-schema).
+
+6. Добавьте URL с настройками БД в переменные окружения. Пример:
+```python
+DB_URL=postgresql://myprojectuser:password@localhost:5432/myproject
+``` 
+
+7. Создание миграций и применение их в PostgreSQL.\
+Выполните команды для создания и применения миграций:
+```sh
+python manage.py makemigrations
+python manage.py migrate
+```
+
+8. Загрузить данные в новую БД. Команда:
+```sh
+python manage.py loaddata data.json
+```
+Подробнее [здесь](https://docs.djangoproject.com/en/5.2/ref/django-admin/#loaddata).
+
+9. Запуск сервера.\
+Теперь вы можете запустить сервер Django и убедиться, что всё работает корректно:
+```sh
+python manage.py runserver
+```
+
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
