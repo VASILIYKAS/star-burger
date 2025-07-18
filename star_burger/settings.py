@@ -18,7 +18,7 @@ YANDEX_APIKEY = env('YANDEX_APIKEY')
 ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN')
 DATABASE_URL = os.getenv('DB_URL')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
