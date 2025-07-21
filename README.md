@@ -233,6 +233,28 @@ python manage.py loaddata data.json
 python manage.py runserver
 ```
 
+## Быстрое обновление кода на сервере
+Для быстрого обновления кода на сервере используется скрипт `deploy_starburger.sh`. Он выполняет все необходимые действия:
+1. **Обновление кода**  
+   - Получает изменения из Git-репозитория (`git pull`)
+
+2. **Установка зависимостей**  
+   - Python: `pip install -r requirements.txt`  
+   - Node.js: `npm ci --dev` (если есть фронтенд)
+
+3. **Сборка проекта**  
+   - Пересобирает статику Django (`collectstatic`)  
+
+4. **Миграции базы данных**  
+   - Автоматически применяет миграции (`migrate --noinput`)
+
+5. **Перезапуск сервисов**  
+   - Gunicorn: `systemctl restart gunicorn`  
+   - Nginx: `systemctl reload nginx`
+
+6. **Отчёт о результате**  
+   - Выводит сообщение при успешном завершении 
+   - Немедленно прерывается при ошибках (`set -Eeuo pipefail`)
 
 ## Цели проекта
 
