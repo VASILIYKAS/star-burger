@@ -2,6 +2,7 @@ bundles/**
 node_modules/
 media/
 /staticfiles/
+/deploy_starburger.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
