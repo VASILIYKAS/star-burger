@@ -256,6 +256,10 @@ python manage.py runserver
    - Выводит сообщение при успешном завершении 
    - Немедленно прерывается при ошибках (`set -Eeuo pipefail`)
 
+Для запуска скрипта перейдите в папку проекта и используйте команду:
+```bash
+./deploy_starburger.sh
+```
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
