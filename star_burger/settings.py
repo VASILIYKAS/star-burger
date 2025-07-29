@@ -15,7 +15,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG')
 YANDEX_APIKEY = env('YANDEX_APIKEY')
-ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN')
+ROLLBAR_ACCESS_TOKEN = env('ROLLBAR_ACCESS_TOKEN', default=None)
 DATABASE_URL = os.getenv('DB_URL')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
