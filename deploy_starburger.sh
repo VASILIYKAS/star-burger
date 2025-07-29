@@ -7,6 +7,8 @@ git pull
 
 npm ci --include=dev
 
+npm run build 
+
 source .venv/bin/activate
 
 pip install -r requirements.txt
