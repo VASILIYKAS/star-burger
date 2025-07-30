@@ -7,7 +7,7 @@ git pull
 
 npm ci --include=dev
 
-npm run build || true
+./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 
 source .venv/bin/activate
 
