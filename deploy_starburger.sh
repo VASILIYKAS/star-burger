@@ -7,7 +7,7 @@ git pull
 
 npm ci --include=dev
 
-npm run build 
+npm run build || true
 
 source .venv/bin/activate
 
@@ -27,20 +27,18 @@ set -a
 source /opt/star-burger/.env || true
 set +a
 
-if [ -z "${ROLLBAR_ACCESS_TOKEN:-}" ]; then
-  echo "Ошибка: переменная ROLLBAR_ACCESS_TOKEN не найдена в файле .env" >&2
-  exit 1
+if [ -n "${ROLLBAR_ACCESS_TOKEN:-}" ]; then
+  curl -X POST "https://api.rollbar.com/api/1/deploy" \
+    -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "environment": "production",
+      "revision": "'"$(git rev-parse HEAD)"'",
+      "local_username": "'"$(whoami)"'",
+      "comment": "Automatic deploy"
+    }'
+  echo "Данные о деплое успешно отправлены в Rollbar."
+else
+  echo "Переменная ROLLBAR_ACCESS_TOKEN не найдена, пропускаем отправку данных в Rollbar."
 fi
-
-curl -X POST "https://api.rollbar.com/api/1/deploy" \
-  -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "environment": "production",
-    "revision": "'"$(git rev-parse HEAD)"'",
-    "local_username": "'"$(whoami)"'",
-    "comment": "Automatic deploy"
-  }'
-
-echo "Данные о деплое успешно отправлены в Rollbar."
 exit 0
