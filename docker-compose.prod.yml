@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:15
+    container_name: star-burger-db
+    restart: always
+    environment:
+      POSTGRES_DB: starburgerdb
+      POSTGRES_USER: starburgeruser
+      POSTGRES_PASSWORD: starburger
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: star-burger-backend
+    restart: always
+    volumes:
+      - static_data:/star-burger/staticfiles
+      - media_data:/star-burger/media
+    environment:
+      - DJANGO_SETTINGS_MODULE=star_burger.settings
+      - DEBUG=False
+      - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN}
+      - DB_URL=postgresql://starburgeruser:starburger@db:5432/starburgerdb
+    command: >
+      sh -c "until pg_isready -h db -p 5432; do echo 'Waiting for database...'; sleep 2; done &&
+            python manage.py migrate &&
+            python manage.py loaddata data.json &&
+            python manage.py collectstatic --noinput &&
+            gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    depends_on:
+      - db
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: star-burger-frontend
+    restart: "no"
+    command: sh -c "npx parcel build bundles-src/index.js --dist-dir bundles --public-url='./'"
+    environment:
+      - ENVIRONMENT=prod
+    volumes:
+      - ./bundles:/star-burger/bundles
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: star-burger-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static_data:/usr/share/nginx/html/static
+      - media_data:/usr/share/nginx/html/media
+      - ./bundles:/usr/share/nginx/html/bundles
+      - /etc/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - backend
+
+volumes:
+  static_data:
+  media_data:
+  postgres_data:
