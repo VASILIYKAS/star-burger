@@ -1,30 +1,26 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-cd /opt/star-burger
+cd /var/www/starburger/star-burger
 
 git pull
 
-npm ci --include=dev
+docker exec -it star-burger-frontend npm ci --include=dev
+docker exec -it star-burger-frontend sh -c \
+  "./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url='/bundles/'"
 
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+docker-compose -f docker-compose.prod.yml build backend frontend
+docker-compose -f docker-compose.prod.yml up -d
 
-source .venv/bin/activate
-
-pip install -r requirements.txt
-
-python manage.py migrate
-
-python manage.py collectstatic --noinput --clear
-
-sudo systemctl restart gunicorn
+docker exec -it star-burger-backend python manage.py migrate
+docker exec -it star-burger-backend python manage.py collectstatic --noinput
 
 sudo systemctl reload nginx
 
 echo "Деплой успешно завершён!"
 
 set -a
-source /opt/star-burger/.env || true
+source .env || true
 set +a
 
 if [ -n "${ROLLBAR_ACCESS_TOKEN:-}" ]; then
