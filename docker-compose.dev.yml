@@ -3,10 +3,8 @@ services:
     image: postgres:15
     container_name: star-burger-db
     restart: always
-    environment:
-      POSTGRES_DB: starburgerdb
-      POSTGRES_USER: starburgeruser
-      POSTGRES_PASSWORD: starburger
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
   backend:
@@ -18,11 +16,8 @@ services:
       - .:/star-burger
       - static_data:/star-burger/staticfiles
       - media_data:/star-burger/media
-    environment:
-      - DJANGO_SETTINGS_MODULE=star_burger.settings
-      - DEBUG=True
-      - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN}
-      - DB_URL=postgresql://starburgeruser:starburger@db:5432/starburgerdb
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     command: >
