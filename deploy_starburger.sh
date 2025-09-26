@@ -5,13 +5,10 @@ cd /var/www/starburger/star-burger
 
 git pull
 
-docker exec -it star-burger-frontend npm ci --include=dev
-docker exec -it star-burger-frontend sh -c \
-  "./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url='/bundles/'"
+docker-compose -f docker-compose.prod.yml rm -f frontend
+docker-compose -f docker-compose.prod.yml up --build frontend
 
-docker-compose -f docker-compose.prod.yml build backend frontend
-docker-compose -f docker-compose.prod.yml up -d
-
+docker exec -it star-burger-backend pip install -r requirements.txt
 docker exec -it star-burger-backend python manage.py migrate
 docker exec -it star-burger-backend python manage.py collectstatic --noinput
 
