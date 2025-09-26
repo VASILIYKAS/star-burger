@@ -17,68 +17,43 @@
 
 ## Оглавление
 
-- [Как запустить dev-версию сайта](#как-запустить-dev-версию-сайта)
-   - [Как собрать бэкенд](#как-собрать-бэкенд)
-      - [Переменные окружения](#переменные-окружения)
-   - [Собрать фронтенд](#собрать-фронтенд)
 - [Переменные окружения](#переменные-окружения)
-- [Модели в Strapi](#модели-в-Strapi)
-- [Запуск проекта](#запуск-проекта)
+- [Как запустить dev-версию сайта](#как-запустить-dev-версию-сайта)
+- [Как запустить prod-версию сайта](#как-запустить-prod-версию-сайта)
+- [Быстрое обновление кода на сервере](#быстрое-обновление-кода-на-сервере)
 - [Цель проекта](#цель-проекта)
 
 
-## Как запустить dev-версию сайта
-
-Для запуска сайта нужно запустить **одновременно** бэкенд и фронтенд, в двух терминалах.
-
-### Как собрать бэкенд
-
-Скачайте код:
-```sh
-git clone https://github.com/devmanorg/star-burger.git
+## Переменные окружения
+Проект использует файл `.env` для хранения конфиденциальных данных. В репозитории уже есть шаблон `example.env`, который нужно скопировать и настроить:
+1. Скопируйте файл example.env в .env:
+- Для macOS и Linux выполните команду:
+```bash
+cp example.env .env
 ```
-
-Перейдите в каталог проекта:
-```sh
-cd star-burger
+- Для Windows используйте команду:
+```powershell
+copy example.env .env
 ```
-
-[Установите Python](https://www.python.org/), если этого ещё не сделали.
-
-Проверьте, что `python` установлен и корректно настроен. Запустите его в командной строке:
-```sh
-python --version
-```
-**Важно!** Версия Python должна быть не ниже 3.6.
-
-Возможно, вместо команды `python` здесь и в остальных инструкциях этого README придётся использовать `python3`. Зависит это от операционной системы и от того, установлен ли у вас Python старой второй версии. 
-
-В каталоге проекта создайте виртуальное окружение:
-```sh
-python -m venv venv
-```
-Активируйте его. На разных операционных системах это делается разными командами:
-
-- Windows: `.\venv\Scripts\activate`
-- MacOS/Linux: `source venv/bin/activate`
-
-Установите зависимости в виртуальное окружение:
-```sh
-pip install -r requirements.txt
-```
-
-
-#### Переменные окружения
+2. Откройте файл `.env` в текстовом редакторе.
+3. Укажите значение переменных после знака `=`:
 
 Определите переменную окружения `SECRET_KEY`. Создать файл `.env` в каталоге `star_burger/` и положите туда такой код:
 ```sh
 SECRET_KEY=django-insecure-0if40nf4nf93n4
 ```
-Добавьте переменную окружения с API-ключом от Яндекса Геокодер, получить можно [здесь](https://developer.tech.yandex.ru/services).
+`YANDEX_APIKEY` - переменная окружения с API-ключом от Яндекса Геокодер, получить можно [здесь](https://developer.tech.yandex.ru/services).
 ```sh
 YANDEX_APIKEY=ваш_ключ
 ```
-Добавьте переменную окружения с ключом [Rollbar](rollbar.com), ключ можно создать в настройках вашего проекта в разделе "Project Access Tokens"
+Добавьте переменную окружения `DEBUG`:
+- `True` — для локального запуска
+- `False` — для запуска на сервере\
+По умолчанию установлено True.
+```sh
+DEBUG=значение
+```
+`ROLLBAR_ACCESS_TOKEN` - переменная окружения с ключом [Rollbar](rollbar.com), ключ можно создать в настройках вашего проекта в разделе "Project Access Tokens"
 ```sh
 ROLLBAR_ACCESS_TOKEN=ваш_ключ
 ```
@@ -86,186 +61,160 @@ ROLLBAR_ACCESS_TOKEN=ваш_ключ
 ```sh
 ENVIRONMENT=значение
 ```
-Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
 
+`ALLOWED_HOSTS` — список доменов и IP-адресов, с которых разрешён доступ. Например:
 ```sh
-python manage.py migrate
+ALLOWED_HOSTS=starburger-dvm.ru,www.starburger-dvm.ru,127.0.0.1,localhost
 ```
-
-Запустите сервер:
-
+`POSTGRES_DB` - Укажите имя для базы данных PostgreSQL. \
+Можете использовать любое, например:
 ```sh
-python manage.py runserver
+POSTGRES_DB=starburgerdb
 ```
-
-Откройте сайт в браузере по адресу [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Если вы увидели пустую белую страницу, то не пугайтесь, выдохните. Просто фронтенд пока ещё не собран. Переходите к следующему разделу README.
-
-### Собрать фронтенд
-
-**Откройте новый терминал**. Для работы сайта в dev-режиме необходима одновременная работа сразу двух программ `runserver` и `parcel`. Каждая требует себе отдельного терминала. Чтобы не выключать `runserver` откройте для фронтенда новый терминал и все нижеследующие инструкции выполняйте там.
-
-[Установите Node.js](https://nodejs.org/en/), если у вас его ещё нет.
-
-Проверьте, что Node.js и его пакетный менеджер корректно установлены. Если всё исправно, то терминал выведет их версии:
-
+`POSTGRES_USER` - Укажите имя пользователя PostgreSQL. \
+Можете использовать любое, например:
 ```sh
-nodejs --version
-# v16.16.0
-# Если ошибка, попробуйте node:
-node --version
-# v16.16.0
-
-npm --version
-# 8.11.0
+POSTGRES_USER=starburgeruser
 ```
-
-Версия `nodejs` должна быть не младше `10.0` и не старше `16.16`. Лучше ставьте `16.16.0`, её мы тестировали. Версия `npm` не важна. Как обновить Node.js читайте в статье: [How to Update Node.js](https://phoenixnap.com/kb/update-node-js-version).
-
-Перейдите в каталог проекта и установите пакеты Node.js:
-
+`POSTGRES_PASSWORD` - Укажите пароль пользователя PostgreSQL.
+Можете использовать любой, например:
 ```sh
-cd star-burger
-npm ci --dev
+POSTGRES_PASSWORD=starburger
 ```
-
-Команда `npm ci` создаст каталог `node_modules` и установит туда пакеты Node.js. Получится аналог виртуального окружения как для Python, но для Node.js.
-
-Помимо прочего будет установлен [Parcel](https://parceljs.org/) — это упаковщик веб-приложений, похожий на [Webpack](https://webpack.js.org/). В отличии от Webpack он прост в использовании и совсем не требует настроек.
-
-Теперь запустите сборку фронтенда и не выключайте. Parcel будет работать в фоне и следить за изменениями в JS-коде:
-
+`POSTGRES_DB` - Строка подключения к базе данных базы данных PostgreSQL. \
+Состоит из имени пользователя, пароля, хоста, порта и имени базы данных.
 ```sh
-./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
+DB_URL=postgresql://starburgeruser:starburger@db:5432/starburgerdb
 ```
 
-Если вы на Windows, то вам нужна та же команда, только с другими слешами в путях:
 
+## Как запустить dev-версию сайта
+Сборка происходит с помощью запуска `docker-compose.dev.yml`\
+Докер должен быть установлен! Скачать можно [здесь](https://www.docker.com/get-started/).\
+Перед запуском укажите все переменные окружения.
+Команда для запуска:
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+Для создания суперпользователя в джанго, нужно выполнить команду из контейнера:
 ```sh
-.\node_modules\.bin\parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
+docker exec -it star-burger-backend python manage.py createsuperuser
 ```
-
-Дождитесь завершения первичной сборки. Это вполне может занять 10 и более секунд. О готовности вы узнаете по сообщению в консоли:
-
-```
-✨  Built in 10.89s
-```
-
-Parcel будет следить за файлами в каталоге `bundles-src`. Сначала он прочитает содержимое `index.js` и узнает какие другие файлы он импортирует. Затем Parcel перейдёт в каждый из этих подключенных файлов и узнает что импортируют они. И так далее, пока не закончатся файлы. В итоге Parcel получит полный список зависимостей. Дальше он соберёт все эти сотни мелких файлов в большие бандлы `bundles/index.js` и `bundles/index.css`. Они полностью самодостаточны, и потому пригодны для запуска в браузере. Именно эти бандлы сервер отправит клиенту.
-
-Теперь если зайти на страницу  [http://127.0.0.1:8000/](http://127.0.0.1:8000/), то вместо пустой страницы вы увидите:
-
-![](https://dvmn.org/filer/canonical/1594651900/687/)
-
-Каталог `bundles` в репозитории особенный — туда Parcel складывает результаты своей работы. Эта директория предназначена исключительно для результатов сборки фронтенда и потому исключёна из репозитория с помощью `.gitignore`.
-
-**Сбросьте кэш браузера <kbd>Ctrl-F5</kbd>.** Браузер при любой возможности старается кэшировать файлы статики: CSS, картинки и js-код. Порой это приводит к странному поведению сайта, когда код уже давно изменился, но браузер этого не замечает и продолжает использовать старую закэшированную версию. В норме Parcel решает эту проблему самостоятельно. Он следит за пересборкой фронтенда и предупреждает JS-код в браузере о необходимости подтянуть свежий код. Но если вдруг что-то у вас идёт не так, то начните ремонт со сброса браузерного кэша, жмите <kbd>Ctrl-F5</kbd>.
+Сайт будет доступен по адресу - https://localhost/\
+Админка - https://localhost/admin
 
 
 ## Как запустить prod-версию сайта
-
-Собрать фронтенд:
-
-```sh
-./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+Сборка происходит с помощью запуска `docker-compose.prod.yml`\
+Перед запуском `docker-compose.prod.yml` небходимо сделать несколько шагов:
+1. Обновить систему:
+```bash
+apt update && apt upgrade -y
 ```
-
-Настроить бэкенд: создать файл `.env` в каталоге `star_burger/` со следующими настройками:
-
-- `DEBUG` — дебаг-режим. Поставьте `False`.
-- `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
-- `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
-- `ROLLBAR_ACCESS_TOKEN` — переменная окружения с ключом [Rollbar](rollbar.com), ключ можно создать в настройках вашего проекта в разделе "Project Access Tokens"
-- `YANDEX_APIKEY` — переменная окружения с API-ключом от Яндекса Геокодер, получить можно [здесь](https://developer.tech.yandex.ru/services)
-- `ENVIRONMENT` — "production" для продакшн версии или "local" для dev-версии сайта по умолчанию "local"
-
-
-## Переход с SQLite на PostgreSQL в Django
-
-### Необходимые шаги:
-
-1. Установка PostgreSQL.\
-Убедитесь, что у вас установлен PostgreSQL. Скачать и установить его можно с официального сайта: [www.postgresql.org](https://www.postgresql.org/download/)
-
-2. Создайте новую базу данных PostgreSQL. Команда:
-```sh
-CREATE DATABASE myproject;
+2. Устанавить Docker и Docker Compose:
+```bash
+apt install -y docker.io docker-compose
+systemctl enable docker
+systemctl start docker
 ```
-3. Создайте пользователя с соответствующими правами. Команда:
-```sh
-CREATE USER myprojectuser WITH PASSWORD 'password';
-
-ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
-ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
-ALTER ROLE myprojectuser SET timezone TO 'UTC';
-
-GRANT ALL PRIVILEGES ON DATABASE myproject TO myprojectuser;
+3. Скопировать проект на сервер:
+```bash
+git clone https://github.com/VASILIYKAS/star-burger.git
 ```
-
-4. Сделайте дамп вашей старой БД. Команда:
-```sh
-python manage.py dumpdata --indent 2 --output data.json
+4. Запустить `docker-compose.prod.yml`, команда:
+```bash 
+docker-compose -f docker-compose.prod.yml up --build
 ```
-Подробнее [здесь](https://docs.djangoproject.com/en/5.2/ref/django-admin/#dumpdata).
+5. Установить Nginx:
+```bash
+apt install -y nginx
+```
+6. Установить Certbot для SSL сертификатов:
+```bash
+apt install -y certbot python3-certbot-nginx
+```
+7. Теперь необходимо настроить Nginx, создаем файл:
+```bash
+nano /etc/nginx/sites-available/starburger.conf
+```
+Содержимое примерно такое
+```sh
+server {
+    listen 80;
+    server_name ваш_домен_или_IP;
 
-5. Редактирование файла настроек settings.py.\
-Откройте файл settings.py вашего Django-проекта и измените раздел DATABASES следующим образом:
-```python
-import dj_database_url
+    # Папка где располгаются статические файлы
+    location /static/ {
+        alias /var/www/starburger/star-burger/staticfiles/;
+    }
 
+    # Папка где располгаются файлы media
+    location /media/ {
+        alias /var/www/starburger/star-burger/media/;
+    }
 
-DATABASE_URL = os.getenv('DB_URL')
+    # Папка где располгаются собраные frontend файлы
+    location /bundles/ {
+        alias /var/www/starburger/star-burger/bundles/;
+    }
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    # Запросы к API проксируются напрямую в backend через Gunicorn
+    location /api/ {
+        include /etc/nginx/proxy_params;
+        proxy_pass http://127.0.0.1:8000;
+    }
+
+    # Все остальные запросы проксируются напрямую в backend через Gunicorn
+    location / {
+        include /etc/nginx/proxy_params;
+        proxy_pass http://127.0.0.1:8000/;
+    }
 }
 ```
-Подробнее [здесь](https://github.com/jazzband/dj-database-url#url-schema).
+8. Создать симлинк (ярлык):
+```bash
+ln -s /etc/nginx/sites-available/starburger.conf /etc/nginx/sites-enabled/
+```
+9. Получить SSL сертификаты:
+```bash
+certbot --nginx -d ваш_домен_или_IP
+```
+Certbot автоматически пропишет SSL в конфиг Nginx.
+10. Перезапустить Nginx:
+```bash
+systemctl reload nginx
+```
+11. Проверка: 
+Открываем браузер: https://ваш_домен_или_IP/
 
-6. Добавьте URL с настройками БД в переменные окружения. Пример:
-```python
-DB_URL=postgresql://myprojectuser:password@localhost:5432/myproject
-``` 
-
-7. Создание миграций и применение их в PostgreSQL.\
-Выполните команды для создания и применения миграций:
-```sh
-python manage.py makemigrations
-python manage.py migrate
+Статус контейнеров:
+```bash
+docker ps
+docker-compose -f docker-compose.prod.yml logs -f
+```
+Статус Nginx и Certbot:
+```bash
+systemctl status nginx
 ```
 
-8. Загрузить данные в новую БД. Команда:
-```sh
-python manage.py loaddata data.json
-```
-Подробнее [здесь](https://docs.djangoproject.com/en/5.2/ref/django-admin/#loaddata).
-
-9. Запуск сервера.\
-Теперь вы можете запустить сервер Django и убедиться, что всё работает корректно:
-```sh
-python manage.py runserver
-```
 
 ## Быстрое обновление кода на сервере
+
 Для быстрого обновления кода на сервере используется скрипт `deploy_starburger.sh`. Он выполняет все необходимые действия:
 1. **Обновление кода**  
    - Получает изменения из Git-репозитория (`git pull`)
 
 2. **Установка зависимостей**  
-   - Python: `pip install -r requirements.txt`  
-   - Node.js: `npm ci --dev` (если есть фронтенд)
+   - Python: `docker exec -it star-burger-backend pip install -r requirements.txt`  
+   - Node.js: `docker-compose -f docker-compose.prod.yml up --build frontend`
 
 3. **Сборка проекта**  
-   - Пересобирает статику Django (`collectstatic`)  
+   - Пересобирает статику Django (`docker exec -it star-burger-backend python manage.py collectstatic --noinput`)  
 
 4. **Миграции базы данных**  
-   - Автоматически применяет миграции (`migrate --noinput`)
+   - Автоматически применяет миграции (`docker exec -it star-burger-backend python manage.py migrate`)
 
-5. **Перезапуск сервисов**  
-   - Gunicorn: `systemctl restart gunicorn`  
+5. **Перезапуск сервисов**    
    - Nginx: `systemctl reload nginx`
 
 6. **Отчёт о результате**  
@@ -280,6 +229,8 @@ python manage.py runserver
 ```bash
 ./deploy_starburger.sh
 ```
+
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
