@@ -119,6 +119,7 @@ systemctl start docker
 ```
 3. Скопировать проект на сервер:
 ```bash
+cd /var/www/starburger
 git clone https://github.com/VASILIYKAS/star-burger.git
 ```
 4. Запустить `docker-compose.prod.yml`, команда:
