@@ -25,7 +25,7 @@ if [ -n "${ROLLBAR_ACCESS_TOKEN:-}" ]; then
     -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
-      "environment": "production",
+      "environment": "'"${ENVIRONMENT}"'",
       "revision": "'"$(git rev-parse HEAD)"'",
       "local_username": "'"$(whoami)"'",
       "comment": "Automatic deploy"
