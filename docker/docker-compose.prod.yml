@@ -9,14 +9,14 @@ services:
       - postgres_data:/var/lib/postgresql/data
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.backend
     container_name: star-burger-backend
     restart: always
     volumes:
-      - ./staticfiles:/star-burger/staticfiles
-      - ./media:/star-burger/media
-      - ./bundles:/star-burger/bundles
+      - ./staticfiles:/star-burger/backend/staticfiles
+      - ./media:/star-burger/backend/media
+      - ./frontend/bundles:/star-burger/frontend/bundles
     env_file:
       - .env
     command: >
@@ -25,21 +25,22 @@ services:
             python manage.py loaddata data.json &&
             python manage.py collectstatic --noinput &&
             gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    working_dir: /star-burger/backend
     ports:
       - "8000:8000"
     depends_on:
       - db
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.frontend
     container_name: star-burger-frontend
     restart: "no"
-    command: sh -c "npx parcel build bundles-src/index.js --dist-dir bundles --public-url='./'"
+    command: sh -c "npx parcel build frontend/bundles-src/index.js --dist-dir frontend/bundles --public-url='./'"
     environment:
       - ENVIRONMENT=prod
     volumes:
-      - ./bundles:/star-burger/bundles
+      - ./frontend/bundles:/star-burger/frontend/bundles
 
 volumes:
   postgres_data:

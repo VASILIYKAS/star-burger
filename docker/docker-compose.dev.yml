@@ -9,13 +9,13 @@ services:
       - postgres_data:/var/lib/postgresql/data
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.backend
     container_name: star-burger-backend
     volumes:
-      - .:/star-burger
-      - static_data:/star-burger/staticfiles
-      - media_data:/star-burger/media
+      - ./backend:/star-burger/backend
+      - static_data:/star-burger/backend/staticfiles
+      - media_data:/star-burger/backend/media
     env_file:
       - .env
     ports:
@@ -30,17 +30,17 @@ services:
       - db
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.frontend
     container_name: star-burger-frontend
     volumes:
-      - ./bundles:/star-burger/bundles
-      - /star-burger/node_modules
+      - ./frontend/bundles:/star-burger/frontend/bundles
+      - /star-burger/frontend/node_modules
     ports:
       - "1234:1234"
     environment:
       - ENVIRONMENT=dev
-    command: npx parcel watch bundles-src/index.js --port 1234 --dist-dir bundles --public-url="./"
+    command: npx parcel watch frontend/bundles-src/index.js --port 1234 --dist-dir frontend/bundles --public-url="./"
 
   nginx:
     build:
@@ -52,7 +52,7 @@ services:
     volumes:
       - static_data:/usr/share/nginx/html/static
       - media_data:/usr/share/nginx/html/media
-      - ./bundles:/usr/share/nginx/html/bundles
+      - ./frontend/bundles:/usr/share/nginx/html/bundles
     depends_on:
       - backend
       - frontend
