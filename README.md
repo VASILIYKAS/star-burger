@@ -89,9 +89,9 @@ DB_URL=postgresql://starburgeruser:starburger@db:5432/starburgerdb
 
 
 ## Как запустить dev-версию сайта
-Сборка происходит с помощью запуска `docker-compose.dev.yml`\
+Сборка происходит с помощью запуска `docker-compose.dev.yml`, который находится в папке `docker`\
 Докер должен быть установлен! Скачать можно [здесь](https://www.docker.com/get-started/).\
-Перед запуском укажите все переменные окружения.
+Перед запуском **укажите все переменные окружения**.
 Команда для запуска:
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
@@ -105,7 +105,7 @@ docker exec -it star-burger-backend python manage.py createsuperuser
 
 
 ## Как запустить prod-версию сайта
-Сборка происходит с помощью запуска `docker-compose.prod.yml`\
+Сборка происходит с помощью запуска `docker-compose.prod.yml`, который находится в папке `docker`\
 Перед запуском `docker-compose.prod.yml` небходимо сделать несколько шагов:
 1. Обновить систему:
 ```bash
@@ -146,17 +146,17 @@ server {
 
     # Папка где располгаются статические файлы
     location /static/ {
-        alias /var/www/starburger/star-burger/staticfiles/;
+        alias /var/www/starburger/star-burger/backend/staticfiles/;
     }
 
     # Папка где располгаются файлы media
     location /media/ {
-        alias /var/www/starburger/star-burger/media/;
+        alias /var/www/starburger/star-burger/backend/media/;
     }
 
     # Папка где располгаются собраные frontend файлы
     location /bundles/ {
-        alias /var/www/starburger/star-burger/bundles/;
+        alias /var/www/starburger/star-burger/frontend/bundles/;
     }
 
     # Запросы к API проксируются напрямую в backend через Gunicorn
