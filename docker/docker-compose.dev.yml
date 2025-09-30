@@ -44,7 +44,7 @@ services:
 
   nginx:
     build:
-      context: .
+      context: ./docker
       dockerfile: Dockerfile.nginx
     container_name: star-burger-nginx
     ports:
